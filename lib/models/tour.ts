@@ -1,11 +1,11 @@
-import { company, contact, endPoint, vehicle } from "./util";
+import { Company, Contact, EndPoint, Vehicle } from "./util";
 
 //referenceId is user id
-export interface tour {
+export interface Tour {
     id: string;
     referenceId: string;
-    contact: contact;
-    startPoint: endPoint;
-    endPoint: endPoint;
-    vehicleType: vehicle;
+    contact: Contact;
+    startPoint: EndPoint;
+    endPoint: EndPoint;
+    vehicleType: Vehicle;
 }

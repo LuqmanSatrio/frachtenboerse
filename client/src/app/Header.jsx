@@ -8,7 +8,7 @@ export default function(){
             <Container>
                 <Dropdown item text='Fahrzeuge'>
                     <Dropdown.Menu>
-                        <Dropdown.Item as={Link} to="tour">Suchen</Dropdown.Item>
+                        <Dropdown.Item as={Link} to="vehicleSearch">Suchen</Dropdown.Item>
                         <Dropdown.Item>Einstellen</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>

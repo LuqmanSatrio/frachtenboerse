@@ -1,4 +1,4 @@
-import {adress, company} from "./util";
+import {Adress, Company} from "./util";
 
 export interface  User {
     id: number,
@@ -7,7 +7,7 @@ export interface  User {
     email: string,
     firstname: string,
     lastname: string,
-    company: company,
-    adress: adress,
+    company: Company,
+    adress: Adress,
     taxId: number
 }

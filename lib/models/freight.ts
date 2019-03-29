@@ -1,4 +1,4 @@
-import { endPoint, company, contact, vehicle } from "./util";
+import { EndPoint, Company, Contact, Vehicle } from "./util";
 
 type freight = {
     widthInMeter: number;
@@ -9,10 +9,10 @@ type freight = {
 export interface endFreight {
     id: string;
     referenceId: string;
-    statingPoint: endPoint;
-    endPoint: endPoint;
+    statingPoint: EndPoint;
+    endPoint: EndPoint;
     freight: freight;
-    neededVehicle: vehicle;
+    neededVehicle: Vehicle;
     note: string;
-    contact: contact;
+    contact: Contact;
 }

@@ -1,4 +1,4 @@
-export interface adress {
+export interface Adress {
     street: string;
     street2: string;
     number: string;
@@ -6,26 +6,29 @@ export interface adress {
     country: string;
 }
 
-export type vehicle= {
-    note: string
+export type Vehicle= {
+    vehicleType: "Sattelzug" | "Gliederzug" | "Kleinfahrzeug";
+    weight : number;
+    length: number;
+    additionalEquipment: "gps" | "hydraulic ramp" | null
 }
 
-export type endPoint = {
-    adress: adress;
+export type EndPoint = {
+    adress: Adress;
     time: Date;
 };
 
-export interface company {
+export interface Company {
     id: number;
     name: string;
-    adress: adress;
+    adress: Adress;
     website: string;
     email: string;
     telephone: string;
     fax: string;
 }
 
-export interface contact {
+export interface Contact {
     name: string;
     speakingLanguage: "german" | "english" | "other";
     telephone: string;
