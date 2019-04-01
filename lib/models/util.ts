@@ -6,11 +6,13 @@ export interface Adress {
     country: string;
 }
 
+export type VehicleType = "Sattelzug" | "Gliederzug" | "Kleinfahrzeug";
+
 export type Vehicle= {
-    vehicleType: "Sattelzug" | "Gliederzug" | "Kleinfahrzeug";
+    vehicleType: VehicleType
     weight : number;
     length: number;
-    additionalEquipment: "gps" | "hydraulic ramp" | null
+    additionalEquipment: string[]
 }
 
 export type EndPoint = {

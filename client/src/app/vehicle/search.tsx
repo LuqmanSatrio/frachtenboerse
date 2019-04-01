@@ -1,7 +1,8 @@
 import React, {Component} from "react";
-import {Container, Segment, Header, Grid, Divider, Form,Input, Table, Menu, Icon, Select, Button} from "semantic-ui-react";
-import {Vehicle} from "../../../../lib/models/util"
+import {Container, Segment, Header, Grid, Divider, Form,Input, Table, Radio, Select, Button} from "semantic-ui-react";
+import {Vehicle, VehicleType} from "../../../../lib/models/util"
 let moment = require('moment');
+let _ =require('underscore');
 
 type EndPoint = {
     location: string,
@@ -38,10 +39,37 @@ export class VehicleSearchComponenr extends React.Component<any, VehicleSearchSt
                 vehicleType: "Sattelzug",
                 weight: 0,
                 length: 0,
-                additionalEquipment: null
+                additionalEquipment: []
             },
             searched: false
         }
+    }
+
+
+    handleAdditionalEquipmentChange(value: string){
+        if(this.state.vehicle.additionalEquipment.includes(value)) {
+            this.setState({
+                ...this.state,
+                vehicle: {
+                    ...this.state.vehicle,
+                    additionalEquipment: this.state.vehicle.additionalEquipment.filter(item => item !== value)
+                }
+
+        });
+            console.log(this.state.vehicle.additionalEquipment);
+        console.log(this.state.vehicle.additionalEquipment.includes(value))}
+        else {
+            this.setState({
+                ...this.state,
+                vehicle: {
+                    ...this.state.vehicle,
+                    additionalEquipment: [...this.state.vehicle.additionalEquipment, value]
+                }
+            })
+            console.log(this.state.vehicle.additionalEquipment);
+            console.log(this.state.vehicle.additionalEquipment.includes(value))
+        }
+
     }
 
     render() {
@@ -81,6 +109,7 @@ export class VehicleSearchComponenr extends React.Component<any, VehicleSearchSt
 
             )
         });
+
         return (
             <Container style={{marginTop: "80px"}}>
                 <Header as='h1'>Fahrzeug suchen</Header>
@@ -91,7 +120,14 @@ export class VehicleSearchComponenr extends React.Component<any, VehicleSearchSt
                                 <Grid.Column width={4}>
                                     <Form.Field>
                                         <label>Startpunkt</label>
-                                        <input placeholder='Postleitzahl eingeben'/>
+                                        <Input type='number' value={this.state.startingPoint.location} onChange={(e,{value}) =>this.setState({
+                                            ...this.state,
+                                            startingPoint : {
+                                                ...this.state.startingPoint,
+                                                location: value
+                                            }
+                                        })
+                                        } placeholder='Postleitzahl eingeben'/>
                                     </Form.Field>
                                     <Form.Field>
                                         <label>Datum</label>
@@ -111,7 +147,16 @@ export class VehicleSearchComponenr extends React.Component<any, VehicleSearchSt
                                 <Grid.Column width={4}>
                                     <Form.Field>
                                         <label>Endpunkt</label>
-                                        <input placeholder='Postleitzahl eingeben'/>
+                                        <Input type='number' placeholder='Postleitzahl eingeben' onChange={(e, {value}) => {
+                                            this.setState({
+                                                ...this.state,
+                                                endpoints : {
+                                                    ...this.state.endpoints,
+                                                    location: value
+                                                }
+                                            })
+
+                                        }}/>
                                     </Form.Field>
                                     <Form.Field>
                                         <label>Datum</label>
@@ -126,25 +171,37 @@ export class VehicleSearchComponenr extends React.Component<any, VehicleSearchSt
                                                 }
                                             })}}  type="date" placeholder='Datum eingeben'/>
                                     </Form.Field>
-                                    <Form.Field>
-                                        <label>Umkreis</label>
-                                        <input placeholder='Umkreis eingeben'/>
-                                    </Form.Field>
                                 </Grid.Column>
                                 <Grid.Column width={8}>
                                     <Header as='h4'> Fahrzeugart auswählen </Header>
                                         <Form.Group
                                             style={{marginTop: "25px"}}
                                             widths={"equal"}>
-                                        <Form.Field
-                                    control={Select}
-                                    options={vehicleOptions}
-                                    label={{children: 'Fahrzeugtyp'}}
-                                    placeholder='Fahrzeugtyp auswählen'
-                                />
+                                        <Form.Field>
+                                            <label>Fahrzeugtyp</label>
+                                            <Select
+                                                options={vehicleOptions}
+                                                placeholder='Fahrzeugtyp auswählen'
+                                                onChange={(e,{value}) => this.setState({
+                                                    ...this.state,
+                                                    vehicle: {
+                                                        ...this.state.vehicle,
+                                                        vehicleType: value as VehicleType
+                                                    }
+                                                })}
+                                            />
+                                        </Form.Field>
                                     <Form.Field>
                                         <label>Länge</label>
-                                        <input type="number" placeholder='Länge eingeben'/>
+                                        <Input type='number' placeholder='Länge eingeben' onChange={(e, {value}) => {
+                                            this.setState({
+                                                ...this.state,
+                                                vehicle: {
+                                                    ...this.state.vehicle,
+                                                    length: 1
+                                                }
+                                            })
+                                        }}/>
                                     </Form.Field>
                                         </Form.Group>
 
@@ -152,15 +209,16 @@ export class VehicleSearchComponenr extends React.Component<any, VehicleSearchSt
                                         widths={"equal"}>
                                         <Form.Field>
                                             <label>Zusätzliche Ausstattung</label>
-                                            <Form.Radio
-                                                label='GPS'
-                                                value='gps'/>
-                                            <Form.Radio
+                                            <Form.Checkbox
+                                                label='GPS Ortung'
+                                                value='gps'
+                                            checked={this.state.vehicle.additionalEquipment.includes('gps')}
+                                            onClick={(e, value)=> this.handleAdditionalEquipmentChange(value.value as string)}/>
+                                            <Form.Checkbox
                                                 label='Hebebühne'
-                                                value='hydraulic ramp'/>
-                                            <Form.Radio
-                                                label='GPS'
-                                                value='gps'/>
+                                                value='hydraulicRamp'
+                                                checked={this.state.vehicle.additionalEquipment.includes('hydraulicRamp')}
+                                                onChange={(e, value)=> this.handleAdditionalEquipmentChange(value.value as string)}/>
 
                                         </Form.Field>
                                         <Form.Field>
@@ -172,10 +230,13 @@ export class VehicleSearchComponenr extends React.Component<any, VehicleSearchSt
                             </Grid.Row>
                             <Divider/>
 
-                                <Button positive floated="right" style={{marginRight: "30px",marginBottom: "10px"}} type="submit" onClick={() => this.setState({
-                                    ...this.state,
-                                    searched: true
-                                })
+                                <Button positive floated="right" style={{marginRight: "30px",marginBottom: "10px"}} type="submit" onClick={() => {
+                                    this.setState({
+                                        ...this.state,
+                                        searched: true
+                                    });
+                                    console.log(this.state)
+                                }
                                 }> Suchen </Button>
 
                             <Grid.Row  style={{ marginRight: "10px", marginLeft: "10px",display: showTable }}>
