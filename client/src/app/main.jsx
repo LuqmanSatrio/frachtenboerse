@@ -1,7 +1,7 @@
 import React from "react";
-import Header from "./Header"
 import tour from "./tour/tour"
 import {VehicleSearchComponenr} from "./vehicle/search"
+import {VehicleSetComponent} from "./vehicle/set";
 import {BrowserRouter as Router, Link, Route} from "react-router-dom";
 import {Container, Menu, Dropdown} from "semantic-ui-react";
 
@@ -15,7 +15,7 @@ export default function Main() {
                         <Dropdown item text='Fahrzeuge'>
                             <Dropdown.Menu>
                                 <Dropdown.Item as={Link} to="vehicleSearch">Suchen</Dropdown.Item>
-                                <Dropdown.Item>Einstellen</Dropdown.Item>
+                                <Dropdown.Item as={Link} to="vehicleSet">Einstellen</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
 
@@ -44,7 +44,7 @@ export default function Main() {
                 </Menu>
                 <Route path="/"/>
                 <Route exact path="/vehicleSearch" component={VehicleSearchComponenr}/>
-                <Route exact path="/vehicleSet" component={tour}/>
+                <Route exact path="/vehicleSet" component={VehicleSetComponent}/>
                 <Route exact path="/tourSerch" component={tour}/>
                 <Route exact path="/tourSet" component={tour}/>
             </div>

@@ -9,6 +9,9 @@ var apiController = require('./controller/apiController');
 var port = process.env.PORT || 3001;
 
 
+app.use('/', express.static(__dirname + '/public'));
+
+
 monggoose.connect(config.getDbConnectionString());
 setupController(app);
 apiController(app);
