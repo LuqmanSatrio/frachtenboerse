@@ -1,9 +1,10 @@
-export interface Adress {
+export interface Address {
     street: string;
-    street2: string;
-    number: string;
-    city: string;
-    country: string;
+    street2?: string;
+    number?: string;
+    postcode?: string;
+    city?: string;
+    country?: string;
 }
 
 export type VehicleType = "Sattelzug" | "Gliederzug" | "Kleinfahrzeug";
@@ -15,15 +16,21 @@ export type Vehicle= {
     additionalEquipment: string[]
 }
 
+export type LoadingStation = "loadingStation" | "unloadingStation"
+
 export type EndPoint = {
-    adress: Adress;
-    time: Date;
+    address: Address;
+    key?: number;
+    loadingStation? : LoadingStation
+    date: Date;
+    startTime: number;
+    endTime: number
 };
 
 export interface Company {
     id: number;
     name: string;
-    adress: Adress;
+    address: Address;
     website: string;
     email: string;
     telephone: string;
@@ -32,8 +39,8 @@ export interface Company {
 
 export interface Contact {
     name: string;
-    speakingLanguage: "german" | "english" | "other";
-    telephone: string;
-    fax: string;
-    mobile: string;
+    speakingLanguage?: "german" | "english" | "other";
+    telephone?: string;
+    fax?: string;
+    mobile?: string;
 }

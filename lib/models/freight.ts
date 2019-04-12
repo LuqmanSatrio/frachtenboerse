@@ -1,18 +1,18 @@
 import { EndPoint, Company, Contact, Vehicle } from "./util";
 
-type freight = {
+type Freight = {
     widthInMeter: number;
     weightInTon: number;
+    freightType: string;
+    price: number;
 };
 
 //referenceId is user id
-export interface endFreight {
+export interface EndFreight {
     id: string;
-    referenceId: string;
-    statingPoint: EndPoint;
-    endPoint: EndPoint;
-    freight: freight;
+    endPoints: EndPoint[];
+    freight: Freight;
     neededVehicle: Vehicle;
-    note: string;
     contact: Contact;
+    internalNote: string
 }

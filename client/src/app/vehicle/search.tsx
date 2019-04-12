@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import {Container, Segment, Header, Grid, Divider, Form,Input, Table, Radio, Select, Button} from "semantic-ui-react";
 import {Vehicle, VehicleType} from "../../../../lib/models/util"
 let moment = require('moment');
-let _ =require('underscore');
 
 type EndPoint = {
     location: string,
@@ -21,7 +20,7 @@ const vehicleOptions = [{key: "s", text: 'Sattelzug', value: 'Sattelzug'}, {
     value: 'Gliederzug'
 }, {key: "k", text: 'Kleinfahrzeug', value: 'Kleinfahrzeug'}];
 
-export class VehicleSearchComponenr extends React.Component<any, VehicleSearchState> {
+export class VehicleSearchComponent extends React.Component<any, VehicleSearchState> {
 
     constructor(props: any) {
         super(props);
