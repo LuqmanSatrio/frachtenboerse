@@ -13,7 +13,7 @@ import {
     Button
 } from "semantic-ui-react";
 import {EndFreight} from "../../../../lib/models/freight";
-import {EndPoint, LoadingStation} from "../../../../lib/models/util";
+import {EndPoint, LoadingStation, VehicleType} from "../../../../lib/models/util";
 
 const contactOptions = [{text: "Max Mustermann", value: "Max Mustermann"}];
 const vehicleOptions = [{key: "s", text: 'Sattelzug', value: 'Sattelzug'}, {
@@ -78,6 +78,27 @@ export default class FreightSet extends React.Component<any, EndFreight> {
             endPoints: mergedArray
         })
 
+    }
+
+    handleAdditionalEquipmentChange(value: string) {
+        if (this.state.neededVehicle.additionalEquipment.includes(value)) {
+            this.setState({
+                ...this.state,
+                neededVehicle: {
+                    ...this.state.neededVehicle,
+                    additionalEquipment: this.state.neededVehicle.additionalEquipment.filter(item => item !== value)
+                }
+
+            });
+        } else {
+            this.setState({
+                ...this.state,
+                neededVehicle: {
+                    ...this.state.neededVehicle,
+                    additionalEquipment: [...this.state.neededVehicle.additionalEquipment, value]
+                }
+            })
+        }
     }
 
 
@@ -276,9 +297,85 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                                     </Form.Group>
                                 </Grid.Column>
                                 <Grid.Column width={6}>
-                                    <Header as={'h4'}> Benötigtes Fahrzeug </Header>
-                                </Grid.Column>
+                                    <Grid.Column width={8}>
+                                        <Header as='h4'> Benötigtes Fahrzeug </Header>
+                                        <Form.Group
+                                            style={{marginTop: "25px"}}
+                                            widths={"equal"}>
+                                            <Form.Field>
+                                                <label>Fahrzeugtyp</label>
+                                                <Select
+                                                    options={vehicleOptions}
+                                                    placeholder='Fahrzeugtyp auswählen'
+                                                    onChange={(e,{value}) => this.setState({
+                                                        ...this.state,
+                                                        neededVehicle: {
+                                                            ...this.state.neededVehicle,
+                                                            vehicleType: value as VehicleType
+                                                        }
+                                                    })}
+                                                />
+                                            </Form.Field>
+                                            <Form.Field>
+                                                <label>Länge</label>
+                                                <Input type='number' placeholder='Länge eingeben' onChange={(e, {value}) => {
+                                                    this.setState({
+                                                        ...this.state,
+                                                        neededVehicle: {
+                                                            ...this.state.neededVehicle,
+                                                            length: 1
+                                                        }
+                                                    })
+                                                }}/>
+                                            </Form.Field>
+                                        </Form.Group>
 
+                                        <Form.Group
+                                            widths={"equal"}>
+                                            <Form.Field>
+                                                <label>Zusätzliche Ausstattung</label>
+                                                <Form.Checkbox
+                                                    label='GPS Ortung'
+                                                    value='gps'
+                                                    checked={this.state.neededVehicle.additionalEquipment.includes('gps')}
+                                                    onClick={(e, value)=> this.handleAdditionalEquipmentChange(value.value as string)}/>
+                                                <Form.Checkbox
+                                                    label='Hebebühne'
+                                                    value='hydraulicRamp'
+                                                    checked={this.state.neededVehicle.additionalEquipment.includes('hydraulicRamp')}
+                                                    onChange={(e, value)=> this.handleAdditionalEquipmentChange(value.value as string)}/>
+
+                                            </Form.Field>
+                                            <Form.Field>
+                                                <label>Gewicht</label>
+                                                <input type="number" placeholder='Gewicht eingeben'/>
+                                            </Form.Field>
+                                        </Form.Group>
+                                    </Grid.Column>
+                                </Grid.Column>
+                                <Grid.Column width={5}>
+                                    <Form.Field>
+                                        <label>Kontaktperson</label>
+                                        <Select options={contactOptions} value={this.state.contact.name} onChange={(e, {v}) => {this.setState({
+                                            contact: {
+                                                ...this.state.contact,
+                                                name: v
+                                            }
+                                        })}}/>
+                                    </Form.Field>
+                                    <Form.Field>
+                                        <label>interne Bemerkung</label>
+                                        <TextArea value={this.state.internalNote} onChange={(e, {v}) => this.setState({internalNote: v})}/>
+                                    </Form.Field>
+                                </Grid.Column>
+                            </Grid.Row>
+                            <Divider style={{marginBottom: "0px",marginLeft: "0px",marginRight: "0px"}}/>
+                            <Grid.Row style={{background: "#f9f9f9"}}>
+                                <Grid.Column floated="right" width={6}>
+                                    <Button positive> Speichern </Button>
+                                    <Button negative> Abbrechen </Button>
+                                    <Button> Vorlage verwenden </Button>
+                                </Grid.Column>
                             </Grid.Row>
                         </Grid>
                     </Form>

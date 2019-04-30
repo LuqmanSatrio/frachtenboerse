@@ -54,9 +54,7 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
                     additionalEquipment: this.state.vehicle.additionalEquipment.filter(item => item !== value)
                 }
 
-        });
-            console.log(this.state.vehicle.additionalEquipment);
-        console.log(this.state.vehicle.additionalEquipment.includes(value))}
+        })}
         else {
             this.setState({
                 ...this.state,
@@ -64,9 +62,7 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
                     ...this.state.vehicle,
                     additionalEquipment: [...this.state.vehicle.additionalEquipment, value]
                 }
-            })
-            console.log(this.state.vehicle.additionalEquipment);
-            console.log(this.state.vehicle.additionalEquipment.includes(value))
+            });
         }
 
     }
@@ -83,8 +79,7 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
                 stopover: ["DK,FR,HU"],
                 weight: 24,
                 length: 7,
-                vehicletype: "Sattelzug",
-                price: 200.00
+                vehicletype: "Sattelzug"
             },
         {
             date: "23.12.1995",
@@ -92,8 +87,7 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
             stopover: ["DK","FR","HU"],
             weight: 24,
             length: 7,
-            vehicletype:"Sattelzug",
-            price: 200.00
+            vehicletype:"Sattelzug"
         }].map(result => {
             return(
                 <Table.Row>
@@ -102,8 +96,7 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
                     <Table.Cell>{result.stopover.join(" ,")}</Table.Cell>
                     <Table.Cell>{result.weight + " kg"}</Table.Cell>
                     <Table.Cell>{result.length + " m"}</Table.Cell>
-                    <Table.Cell>{result.vehicletype}</Table.Cell>
-                    <Table.Cell>{result.price}</Table.Cell>
+                    <Table.Cell><a href="/vehicleDetail" > {result.vehicletype} </a></Table.Cell>
                 </Table.Row>
 
             )
@@ -234,7 +227,6 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
                                         ...this.state,
                                         searched: true
                                     });
-                                    console.log(this.state)
                                 }
                                 }> Suchen </Button>
 
@@ -248,7 +240,6 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
                                             <Table.HeaderCell width={1}>Gewicht (t)</Table.HeaderCell>
                                             <Table.HeaderCell width={1}>Länge (m)</Table.HeaderCell>
                                             <Table.HeaderCell width={1}>Fahrzeugtyp</Table.HeaderCell>
-                                            <Table.HeaderCell width={1}>Vergütung in €</Table.HeaderCell>
                                         </Table.Row>
                                     </Table.Header>
 

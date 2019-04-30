@@ -14,5 +14,8 @@
     "express": "^4.16.4",
     "mongoose": "^5.4.11",
     "path": "^0.12.7"
+  },
+  "dependencies": {
+    "@types/node": "^11.13.8"
   }
 }

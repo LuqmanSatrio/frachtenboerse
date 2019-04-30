@@ -1,13 +1,13 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
-var todoSchema = new Schema({
+const todoSchema = new Schema({
     username: String,
     todo: String,
     done: Boolean
 });
 
-var ToDos = mongoose.model('Todos', todoSchema);
+const ToDos = mongoose.model('Todos', todoSchema);
 
 module.exports = ToDos;

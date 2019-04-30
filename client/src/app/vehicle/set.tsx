@@ -76,8 +76,6 @@ export class VehicleSetComponent extends React.Component<any, VehicleSearchState
                 }
 
             });
-            console.log(this.state.vehicle.additionalEquipment);
-            console.log(this.state.vehicle.additionalEquipment.includes(value))
         } else {
             this.setState({
                 ...this.state,
@@ -86,49 +84,10 @@ export class VehicleSetComponent extends React.Component<any, VehicleSearchState
                     additionalEquipment: [...this.state.vehicle.additionalEquipment, value]
                 }
             })
-            console.log(this.state.vehicle.additionalEquipment);
-            console.log(this.state.vehicle.additionalEquipment.includes(value))
         }
-
     }
 
     render() {
-
-        const {searched} = this.state;
-
-        let showTable = searched ? "block" : "none";
-
-        let suggestedSearchResult = [{
-            date: "23.12.1995",
-            startingPoint: "De, Hamburg 21129",
-            stopover: ["DK,FR,HU"],
-            weight: 24,
-            length: 7,
-            vehicletype: "Sattelzug",
-            price: 200.00
-        },
-            {
-                date: "23.12.1995",
-                startingPoint: "De, Hamburg 21129",
-                stopover: ["DK", "FR", "HU"],
-                weight: 24,
-                length: 7,
-                vehicletype: "Sattelzug",
-                price: 200.00
-            }].map(result => {
-            return (
-                <Table.Row>
-                    <Table.Cell>{result.date}</Table.Cell>
-                    <Table.Cell>{result.startingPoint}</Table.Cell>
-                    <Table.Cell>{result.stopover.join(" ,")}</Table.Cell>
-                    <Table.Cell>{result.weight + " kg"}</Table.Cell>
-                    <Table.Cell>{result.length + " m"}</Table.Cell>
-                    <Table.Cell>{result.vehicletype}</Table.Cell>
-                    <Table.Cell>{result.price}</Table.Cell>
-                </Table.Row>
-
-            )
-        });
 
         return (
             <Container style={{marginTop: "80px"}}>
