@@ -52,6 +52,7 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
     async getApi() {
         try {
             let result = await api.getFreight();
+            console.log(result)
         } catch (e) {
             console.log("err")
         }
