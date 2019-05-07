@@ -1,10 +1,10 @@
 import React, {Component} from "react";
 import {Container, Segment, Header, Grid, Divider, Form, Input, Table, Radio, Select, Button} from "semantic-ui-react";
 import {Vehicle, VehicleType} from "../../../../lib/models/util"
+import {EndFreight} from "../../../../lib/models/freight";
 
 let moment = require('moment');
 import {Api} from "../../api";
-import * as request from "request";
 
 const api: Api = new Api();
 
@@ -17,7 +17,8 @@ type VehicleSearchState = {
     startingPoint: EndPoint,
     endpoints: EndPoint,
     vehicle: Vehicle,
-    searched: boolean
+    searched: boolean,
+    suggestedResults: EndFreight[]
 }
 const vehicleOptions = [{key: "s", text: 'Sattelzug', value: 'Sattelzug'}, {
     key: "g",
@@ -45,18 +46,20 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
                 length: 0,
                 additionalEquipment: []
             },
-            searched: false
+            searched: false,
+            suggestedResults: []
         }
     }
 
-    async getApi() {
+    async getFreight() {
         try {
-            let result = await api.getFreight();
+            let result = await api.getFreights();
             console.log(result)
         } catch (e) {
             console.log("err")
         }
     }
+
 
     handleAdditionalEquipmentChange(value: string) {
         if (this.state.vehicle.additionalEquipment.includes(value)) {
@@ -77,7 +80,7 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
                     ...this.state.vehicle,
                     additionalEquipment: [...this.state.vehicle.additionalEquipment, value]
                 }
-            })
+            });
             console.log(this.state.vehicle.additionalEquipment);
             console.log(this.state.vehicle.additionalEquipment.includes(value))
         }
@@ -86,11 +89,11 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
 
     render() {
 
-        const {searched} = this.state;
+        const {searched, suggestedResults} = this.state;
 
         let showTable = searched ? "block" : "none";
 
-        let suggestedSearchResult = [{
+        let testResult = [{
             date: "23.12.1995",
             startingPoint: "De, Hamburg 21129",
             stopover: ["DK,FR,HU"],
@@ -107,16 +110,17 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
                 length: 7,
                 vehicletype: "Sattelzug",
                 price: 200.00
-            }].map(result => {
+            }];
+
+        let suggestedSearchResult = suggestedResults.map(result => {
             return (
                 <Table.Row>
-                    <Table.Cell>{result.date}</Table.Cell>
-                    <Table.Cell>{result.startingPoint}</Table.Cell>
-                    <Table.Cell>{result.stopover.join(" ,")}</Table.Cell>
-                    <Table.Cell>{result.weight + " kg"}</Table.Cell>
-                    <Table.Cell>{result.length + " m"}</Table.Cell>
-                    <Table.Cell>{result.vehicletype}</Table.Cell>
-                    <Table.Cell>{result.price}</Table.Cell>
+                    <Table.Cell>{result.endPoints[0].date}</Table.Cell>
+                    <Table.Cell>{result.endPoints[0].address}</Table.Cell>
+                    <Table.Cell>{result.freight.weightInTon + " kg"}</Table.Cell>
+                    <Table.Cell>{result.freight.widthInMeter + " m"}</Table.Cell>
+                    <Table.Cell>{result.freight.freightType}</Table.Cell>
+                    <Table.Cell>{result.freight.price}</Table.Cell>
                 </Table.Row>
 
             )
@@ -253,7 +257,7 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
                                     ...this.state,
                                     searched: true
                                 });
-                                this.getApi();
+                                this.getFreight();
                             }
                             }> Suchen </Button>
 

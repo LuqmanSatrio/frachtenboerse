@@ -21,7 +21,7 @@ export type LoadingStation = "loadingStation" | "unloadingStation"
 export type EndPoint = {
     address: Address;
     key?: number;
-    loadingStation? : LoadingStation
+    loadingStation : LoadingStation
     date: Date;
     startTime: number;
     endTime: number

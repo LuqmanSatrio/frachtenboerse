@@ -1,5 +1,5 @@
 let ToDos = require('../models/toDoModel');
-let Freights = require('../models/freightModel')
+let Freights = require('../models/freightModel');
 var bodyParser = require('body-parser');
 
 module.exports = function (app) {
@@ -55,18 +55,31 @@ module.exports = function (app) {
         }
     });
 
+    app.get('/api/freight/', function (req, res) {
+
+        Freights.find(function (err, todo) {
+            if (err){
+                alert(err)
+            }
+            else {
+                res.send(todo)
+            }
+        });
+    });
+
     app.post('/api/freight', function (req, res) {
         console.log(req);
 
         let newFreight = Freights({
             endPoints: req.body.endPoints,
             freight: req.body.freight,
+            neededVehicle: req.body.neededVehicle,
             contact: req.body.contact,
             internalNote: req.body.internalNote
         });
         newFreight.save(function (err) {
-            res.send("success")
 
+            res.send("success")
         })
     });
 

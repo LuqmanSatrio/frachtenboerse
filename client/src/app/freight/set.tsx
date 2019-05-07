@@ -14,6 +14,8 @@ import {
 } from "semantic-ui-react";
 import {EndFreight} from "../../../../lib/models/freight";
 import {EndPoint, LoadingStation, VehicleType} from "../../../../lib/models/util";
+import {Api} from "../../api";
+const api: Api = new Api();
 
 const contactOptions = [{text: "Max Mustermann", value: "Max Mustermann"}];
 const vehicleOptions = [{key: "s", text: 'Sattelzug', value: 'Sattelzug'}, {
@@ -54,6 +56,17 @@ export default class FreightSet extends React.Component<any, EndFreight> {
             },
             contact: {name: ""},
             internalNote: ""
+        }
+    }
+
+   async setCustomer(){
+        try {
+            console.log(this.state);
+           let result=  api.sendFreights(this.state);
+            console.log(result + " succesfully added")
+        }
+        catch (e) {
+            alert(e)
         }
     }
 
@@ -108,7 +121,7 @@ export default class FreightSet extends React.Component<any, EndFreight> {
 
         let endPointsRow = endPoints.map((endPoints, key) => {
             return (
-                <Form.Group>
+                <Form.Group key={key}>
                     <Form.Field>
                         <label>Be/Entladestelle</label>
                         <Select
@@ -153,7 +166,7 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                     <Form.Field width={2}>
                         <label>Plz</label>
                         <Input
-                            value={this.state.endPoints[key].address.street}
+                            value={this.state.endPoints[key].address.postcode}
                             onChange={(e, {value}) => this.setState({
                                 ...this.state,
                                 endPoints: [...this.state.endPoints.slice(0, key), {
@@ -166,7 +179,7 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                     <Form.Field width={2}>
                         <label>Ort</label>
                         <Input
-                            value={this.state.endPoints[key].address.street}
+                            value={this.state.endPoints[key].address.city}
                             onChange={(e, {value}) => this.setState({
                                 ...this.state,
                                 endPoints: [...this.state.endPoints.slice(0, key), {
@@ -179,7 +192,7 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                     <Form.Field width={2}>
                         <label>Land</label>
                         <Input
-                            value={this.state.endPoints[key].address.street}
+                            value={this.state.endPoints[key].address.country}
                             onChange={(e, {value}) => this.setState({
                                 ...this.state,
                                 endPoints: [...this.state.endPoints.slice(0, key), {
@@ -356,23 +369,23 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                                 <Grid.Column width={5}>
                                     <Form.Field>
                                         <label>Kontaktperson</label>
-                                        <Select options={contactOptions} value={this.state.contact.name} onChange={(e, {v}) => {this.setState({
+                                        <Select options={contactOptions} value={this.state.contact.name} onChange={(e, {value}) => {this.setState({
                                             contact: {
                                                 ...this.state.contact,
-                                                name: v
+                                                name: value as string
                                             }
                                         })}}/>
                                     </Form.Field>
                                     <Form.Field>
                                         <label>interne Bemerkung</label>
-                                        <TextArea value={this.state.internalNote} onChange={(e, {v}) => this.setState({internalNote: v})}/>
+                                        <TextArea value={this.state.internalNote} onChange={(e, {value}) => this.setState({internalNote: value as string})}/>
                                     </Form.Field>
                                 </Grid.Column>
                             </Grid.Row>
                             <Divider style={{marginBottom: "0px",marginLeft: "0px",marginRight: "0px"}}/>
                             <Grid.Row style={{background: "#f9f9f9"}}>
                                 <Grid.Column floated="right" width={6}>
-                                    <Button positive> Speichern </Button>
+                                    <Button positive onClick={() => this.setCustomer()}> Speichern </Button>
                                     <Button negative> Abbrechen </Button>
                                     <Button> Vorlage verwenden </Button>
                                 </Grid.Column>

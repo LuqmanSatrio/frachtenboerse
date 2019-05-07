@@ -1,4 +1,4 @@
-import { EndPoint, Company, Contact, Vehicle } from "./util";
+import {EndPoint, Company, Contact, Vehicle} from "./util";
 
 type Freight = {
     widthInMeter: number;

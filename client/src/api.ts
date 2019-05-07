@@ -1,9 +1,15 @@
 import * as request from "request";
+import {EndFreight} from "../../lib/models/freight";
 
 
 interface GetRequestParams {
     path: string;
     qs?: Object;
+}
+
+interface PostRequestParams<ObjectType> {
+    path: string;
+    body: ObjectType;
 }
 
 
@@ -19,11 +25,46 @@ export class Api {
         return this.baseUrl + path;
     }
 
-    getFreight(): Promise<any> {
+    getFreights(): Promise<any> {
         return this.getRequest({
-            path: `/api/todo/yeet`
+            path: `/api/freight`
         });
     }
+
+    sendFreights(freight: EndFreight): Promise<any> {
+        return this.putRequest({path: `/api/freight`, body: freight})
+    }
+
+    private putRequest<C>(params: PostRequestParams<C>): Promise<C> {
+        return new Promise((resolve, reject) => {
+            request.post(
+                {
+                    url: this.urlFromPath(params.path),
+                    body: params.body,
+                    json: true
+                },
+                (error, response, body) => {
+                    if (
+                        response &&
+                        response.statusCode >= 200 &&
+                        response.statusCode <= 299 &&
+                        body &&
+                        body.success == true
+                    ) {
+                        console.log(response);
+                        resolve(body);
+                    } else if (response && body && body.success == false) {
+                        reject(error);
+                    } else if (error) {
+                        reject(error);
+                    } else {
+                        resolve(body);
+                    }
+                }
+            );
+        });
+    }
+
 
 
     private getRequest<C>(params: GetRequestParams): Promise<C> {
@@ -42,7 +83,7 @@ export class Api {
                         body &&
                         body.success == true
                     ) {
-                        console.log(response)
+                        console.log(response);
                         resolve(body);
                     } else if (response && body && body.success == false) {
                         reject(error);
