@@ -1,5 +1,6 @@
 import * as request from "request";
 import {EndFreight} from "../../lib/models/freight";
+import {Vehicle} from "../../lib/models/util";
 
 
 interface GetRequestParams {
@@ -25,9 +26,10 @@ export class Api {
         return this.baseUrl + path;
     }
 
-    getFreights(): Promise<any> {
+    getFreights(vehicle: Vehicle): Promise<any> {
+        const qs: any = {vehicle: vehicle};
         return this.getRequest({
-            path: `/api/freight`
+            path: `/api/freight`, qs: qs
         });
     }
 

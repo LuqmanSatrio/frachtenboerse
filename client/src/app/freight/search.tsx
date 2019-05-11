@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Container, Segment, Header, Grid, Divider, Form, Input, Table, Radio, Select, Button} from "semantic-ui-react";
-import {Vehicle, VehicleType} from "../../../../lib/models/util"
+import {Vehicle, VehicleType, EndPoint} from "../../../../lib/models/util"
 import {EndFreight} from "../../../../lib/models/freight";
 
 let moment = require('moment');
@@ -8,16 +8,14 @@ import {Api} from "../../api";
 
 const api: Api = new Api();
 
-type EndPoint = {
-    location: string,
-    date: string
-}
+
 
 type VehicleSearchState = {
     startingPoint: EndPoint,
     endpoints: EndPoint,
     vehicle: Vehicle,
     searched: boolean,
+    loading: boolean,
     suggestedResults: EndFreight[]
 }
 const vehicleOptions = [{key: "s", text: 'Sattelzug', value: 'Sattelzug'}, {
@@ -33,12 +31,27 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
 
         this.state = {
             startingPoint: {
-                location: "",
-                date: moment().format('YYYY-MM-DD')
+                address: {
+                    street: "",
+                    number: "",
+                    postcode: "",
+                    city: "",
+                    country:""
+                },
+                loadingStation: "loadingStation",
+                date: moment().format('YYYY-MM-DD'),
+
             },
             endpoints: {
-                location: "",
-                date: moment().format('YYYY-MM-DD')
+                address: {
+                    street: "",
+                    number: "",
+                    postcode: "",
+                    city: "",
+                    country:""
+                },
+                loadingStation: "unloadingStation",
+                date: moment().format('YYYY-MM-DD'),
             },
             vehicle: {
                 vehicleType: "Sattelzug",
@@ -47,14 +60,16 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
                 additionalEquipment: []
             },
             searched: false,
-            suggestedResults: []
+            suggestedResults: [],
+            loading: false
         }
     }
 
     async getFreight() {
         try {
-            let result = await api.getFreights();
-            console.log(result)
+            let result = await api.getFreights(this.state.vehicle);
+            this.setState({suggestedResults: result, loading: false});
+
         } catch (e) {
             console.log("err")
         }
@@ -71,8 +86,6 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
                 }
 
             });
-            console.log(this.state.vehicle.additionalEquipment);
-            console.log(this.state.vehicle.additionalEquipment.includes(value))
         } else {
             this.setState({
                 ...this.state,
@@ -81,42 +94,25 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
                     additionalEquipment: [...this.state.vehicle.additionalEquipment, value]
                 }
             });
-            console.log(this.state.vehicle.additionalEquipment);
-            console.log(this.state.vehicle.additionalEquipment.includes(value))
         }
 
     }
 
     render() {
 
-        const {searched, suggestedResults} = this.state;
+        const {searched, suggestedResults, loading} = this.state;
 
         let showTable = searched ? "block" : "none";
 
-        let testResult = [{
-            date: "23.12.1995",
-            startingPoint: "De, Hamburg 21129",
-            stopover: ["DK,FR,HU"],
-            weight: 24,
-            length: 7,
-            vehicletype: "Sattelzug",
-            price: 200.00
-        },
-            {
-                date: "23.12.1995",
-                startingPoint: "De, Hamburg 21129",
-                stopover: ["DK", "FR", "HU"],
-                weight: 24,
-                length: 7,
-                vehicletype: "Sattelzug",
-                price: 200.00
-            }];
-
-        let suggestedSearchResult = suggestedResults.map(result => {
+        let suggestedSearchResult = suggestedResults.map((result, key) => {
             return (
-                <Table.Row>
+                <Table.Row key={key}>
                     <Table.Cell>{result.endPoints[0].date}</Table.Cell>
-                    <Table.Cell>{result.endPoints[0].address}</Table.Cell>
+                    <Table.Cell>{result.endPoints[0].address.street}</Table.Cell>
+                    <Table.Cell>{ result.endPoints.map((endpoint) => {
+                        return (endpoint.address.city)
+                    }).join(", ")
+                    }</Table.Cell>
                     <Table.Cell>{result.freight.weightInTon + " kg"}</Table.Cell>
                     <Table.Cell>{result.freight.widthInMeter + " m"}</Table.Cell>
                     <Table.Cell>{result.freight.freightType}</Table.Cell>
@@ -135,8 +131,8 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
                             <Grid.Row>
                                 <Grid.Column width={4}>
                                     <Form.Field>
-                                        <label>Startpunkt</label>
-                                        <Input type='number' value={this.state.startingPoint.location}
+                                        <label>Startadresse</label>
+                                        <Input type='number' value={2}
                                                onChange={(e, {value}) => this.setState({
                                                    ...this.state,
                                                    startingPoint: {
@@ -251,11 +247,12 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
                             </Grid.Row>
                             <Divider/>
 
-                            <Button positive floated="right" style={{marginRight: "30px", marginBottom: "10px"}}
+                            <Button positive floated="right" loading={loading} style={{marginRight: "30px", marginBottom: "10px"}}
                                     type="submit" onClick={() => {
                                 this.setState({
                                     ...this.state,
-                                    searched: true
+                                    searched: true,
+                                    loading: true
                                 });
                                 this.getFreight();
                             }

@@ -23,8 +23,8 @@ export type EndPoint = {
     key?: number;
     loadingStation : LoadingStation
     date: Date;
-    startTime: number;
-    endTime: number
+    startTime?: number;
+    endTime?: number
 };
 
 export interface Company {

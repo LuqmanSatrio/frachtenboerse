@@ -12,7 +12,12 @@ var port = process.env.PORT || 3001;
 app.use('/', express.static(__dirname + '/public'));
 
 
-monggoose.connect(config.getDbConnectionString());
+monggoose.connect(config.getDbConnectionString()).then(()=>{
+
+}).catch((err)=> {
+    console.log(err)
+});
+
 setupController(app);
 apiController(app);
 
