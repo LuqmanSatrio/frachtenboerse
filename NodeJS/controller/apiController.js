@@ -41,8 +41,12 @@ module.exports = function (app) {
 
     app.post('/api/freight', function (req, res) {
 
+        console.log(req.body)
+
         let newFreight = Freights({
-            endPoints: req.body.endPoints,
+            startingPoint: req.body.startingPoint,
+            pointsBetween: req.body.pointsBetween,
+            endPoint: req.body.endPoint,
             freight: req.body.freight,
             neededVehicle: req.body.neededVehicle,
             contact: req.body.contact,
