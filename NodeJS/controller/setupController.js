@@ -6,31 +6,41 @@ module.exports = function (app) {
 
         const newFreight = [
             {
-                id: "12938",
-                endPoints: [
+                startingPoint: {
+                    address: {
+                        street: "Neßdeich",
+                        number: "152",
+                        postcode: "21129",
+                        city: "Paris",
+                        country: "Frankreich"
+                    },
+                    loadingStation: "loadingStation",
+                    date: new Date()
+                },
+                pointsBetween: [
                     {
                         address: {
                             street: "Neßdeich",
                             number: "152",
-                            postcode: "21129",
-                            city: "Hamburg",
-                            country: "Germany"
+                            postcode: "1010",
+                            city: "Rom",
+                            country: "Italien"
                         },
                         loadingStation: "loadingStation",
                         date: new Date()
-                    },
-                    {
-                        address: {
-                            street: "Hellstraß3",
-                            number: "152",
-                            postcode: "212329",
-                            city: "Hamburg",
-                            country: "Germany"
-                        },
-                        loadingStation: "unloadingStation",
-                        date: new Date()
                     }
                 ],
+                endPoint: {
+                    address: {
+                        street: "Neßdeich",
+                        number: "152",
+                        postcode: "1900",
+                        city: "Wien",
+                        country: "Österreich"
+                    },
+                    loadingStation: "loadingStation",
+                    date: new Date()
+                },
                 freight: {
                     widthInMeter: 20,
                     weightInTon: 10,
@@ -45,15 +55,25 @@ module.exports = function (app) {
                         additionalEquipment: ["Gps", "Zange"],
                     }
             }, {
-                id: "12938",
-                endPoints: [
+                startingPoint: {
+                    address: {
+                        street: "Neßdeich",
+                        number: "152",
+                        postcode: "21129",
+                        city: "Hamburg",
+                        country: "Deutschland"
+                    },
+                    loadingStation: "loadingStation",
+                    date: new Date()
+                },
+                pointsBetween: [
                     {
                         address: {
                             street: "Neßdeich",
                             number: "152",
-                            postcode: "21129",
-                            city: "Hamburg",
-                            country: "Germany"
+                            postcode: "1010",
+                            city: "Wien",
+                            country: "Österreich"
                         },
                         loadingStation: "loadingStation",
                         date: new Date()
@@ -62,27 +82,36 @@ module.exports = function (app) {
                         address: {
                             street: "Hellstraß3",
                             number: "152",
-                            postcode: "212329",
-                            city: "Hamburg",
-                            country: "Germany"
+                            postcode: "81103",
+                            city: "Bratislava",
+                            country: "Slowakai"
                         },
                         loadingStation: "unloadingStation",
                         date: new Date()
                     }
                 ],
-                freight: {
-                    widthInMeter: 20,
-                    weightInTon: 10,
-                    freightType: "Gefahrgut",
-                    price: 600
-                },
-                neededVehicle:
-                    {
-                        vehicleType: "Sattelzug",
-                        weight: 10,
-                        length: 10,
-                        additionalEquipment: ["Gps", "Zange"],
-                    }
+                endPoint: {
+                    address: {
+                        street: "Neßdeich",
+                        number: "152",
+                        postcode: "1900",
+                        city: "Hungary",
+                        country: "Budapest"
+                    },
+                    freight: {
+                        widthInMeter: 20,
+                        weightInTon: 10,
+                        freightType: "Gefahrgut",
+                        price: 600
+                    },
+                    neededVehicle:
+                        {
+                            vehicleType: "Sattelzug",
+                            weight: 10,
+                            length: 10,
+                            additionalEquipment: ["Gps", "Zange"],
+                        }
+                }
             }
         ];
 

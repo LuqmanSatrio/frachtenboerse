@@ -10,15 +10,33 @@ module.exports = function (app) {
 
     app.get('/api/freight/', function (req, res) {
 
+        const vehicle = {
+            "vehicleType": req.query.neededVehicle.vehicleType,
+            "weight": parseInt(req.query.neededVehicle.weight),
+            "length": parseInt(req.query.neededVehicle.length),
+            "additionalEquipment": req.query.neededVehicle.additionalEquipment
+        };
+
         Freights.find({
-           
-        }, function (err, todo) {
-            if (err) {
-                alert(err)
-            } else {
-                res.send(todo)
+                "neededVehicle": vehicle,
+                "startingPoint.address.city": req.query.startingPoint.address.city,
+                "startingPoint.address.country": req.query.startingPoint.address.country,
+                "startingPoint.address.postcode": req.query.startingPoint.address.postcode,
+                "startingPoint.date": parseInt(req.query.startingPoint.date),
+                "endPoint.address.city": req.query.endPoint.address.city,
+                "endPoint.address.country": req.query.endPoint.address.country,
+                "endPoint.address.postcode": req.query.endPoint.address.postcode,
+                "endPoint.date": parseInt(req.query.endPoint.date)
             }
-        });
+            , function (err, result) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    console.log(result);
+                    res.send(result)
+
+                }
+            });
     });
 
     app.post('/api/freight', function (req, res) {

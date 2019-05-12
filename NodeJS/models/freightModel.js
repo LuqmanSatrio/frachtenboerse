@@ -4,7 +4,9 @@ const Schema = mongoose.Schema;
 
 const freightSchema = new Schema({
     id: String,
-    endPoints: Array,
+    startingPoint: Object,
+    pointsBetween: Array,
+    endPoint: Object,
     freight: Object,
     neededVehicle: Object,
     contact: Object,
