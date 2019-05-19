@@ -8,6 +8,7 @@
     "@types/react-datepicker": "^2.2.0",
     "@types/request": "^2.48.1",
     "@types/uuid": "^3.4.4",
+    "moment": "^2.24.0",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
     "react-router-dom": "^4.3.1",

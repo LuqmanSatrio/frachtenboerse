@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import {
+    Dropdown,
     Container,
     Segment,
     Header,
@@ -7,14 +8,15 @@ import {
     Divider,
     Form,
     Input,
-    Table,
     TextArea,
     Select,
     Button
 } from "semantic-ui-react";
-import {EndFreight} from "../../../../lib/models/freight";
-import {EndPoint, LoadingStation, VehicleType} from "../../../../lib/models/util";
+let moment = require('moment');
+import {Contact, EndPoint, LoadingStation, Vehicle, VehicleType, countryOptions} from "../../lib/models/util";
 import {Api} from "../../api";
+import {Freight} from "../../lib/models/freight";
+
 const api: Api = new Api();
 
 const contactOptions = [{text: "Max Mustermann", value: "Max Mustermann"}];
@@ -28,7 +30,17 @@ const loadingOptions = [{text: "Beladestelle", value: "loadingStation"}, {
     value: "unLoadingStation"
 }];
 
-export default class FreightSet extends React.Component<any, EndFreight> {
+interface freightSetState {
+    id: string;
+    endPoints : EndPoint[];
+    freight: Freight;
+    neededVehicle: Vehicle,
+    contact: Contact,
+    internalNote: string,
+loading: boolean
+}
+
+export default class FreightSet extends React.Component<any, freightSetState> {
 
     constructor(props: any) {
         super(props);
@@ -38,7 +50,7 @@ export default class FreightSet extends React.Component<any, EndFreight> {
             endPoints: [{
                 address: {street: ""},
                 loadingStation: "loadingStation",
-                date: new Date(),
+                date: this.setTimeTo12(new Date()).getTime(),
                 startTime: 0,
                 endTime: 0
             }],
@@ -55,19 +67,30 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                 additionalEquipment: []
             },
             contact: {name: ""},
-            internalNote: ""
+            internalNote: "",
+            loading: false
         }
     }
 
-   async setCustomer(){
+    async setCustomer() {
+        this.setState({loading:true});
         try {
-            console.log(this.state);
-           let result=  api.sendFreights(this.state);
-            console.log(result + " succesfully added")
-        }
-        catch (e) {
+            await api.sendFreight({
+                id: "",
+                startingPoint: this.state.endPoints[0],
+                pointsBetween: this.state.endPoints.length > 2 ? this.state.endPoints.splice(1, this.state.endPoints.length - 2) : [],
+                endPoint: this.state.endPoints[this.state.endPoints.length - 1],
+                freight: this.state.freight,
+                neededVehicle: this.state.neededVehicle,
+                contact: this.state.contact,
+                internalNote: this.state.internalNote
+            });
+
+        } catch (e) {
             alert(e)
         }
+
+        this.setState({loading:false});
     }
 
     createNewEndPoint() {
@@ -79,7 +102,7 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                     country: ""
                 },
                 loadingStation: "loadingStation",
-                date: new Date(),
+                date: new Date().getTime(),
                 startTime: 0,
                 endTime: 0
             };
@@ -114,12 +137,17 @@ export default class FreightSet extends React.Component<any, EndFreight> {
         }
     }
 
+    setTimeTo12(date: Date){
+        date.setHours(12,0,0,0);
+        return(date)
+    }
+
 
     render() {
 
         const {endPoints} = this.state;
 
-        let endPointsRow = endPoints.map((endPoints, key) => {
+        let endPointsRow = endPoints.map((endPoint, key) => {
             return (
                 <Form.Group key={key}>
                     <Form.Field>
@@ -191,17 +219,34 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                     </Form.Field>
                     <Form.Field width={2}>
                         <label>Land</label>
-                        <Input
+                        <Dropdown
+                            fluid
+                            selection
+                            options={countryOptions}
                             value={this.state.endPoints[key].address.country}
                             onChange={(e, {value}) => this.setState({
                                 ...this.state,
                                 endPoints: [...this.state.endPoints.slice(0, key), {
                                     ...this.state.endPoints[key],
-                                    address: {...this.state.endPoints[key].address, country: value},
+                                    address: {...this.state.endPoints[key].address, country: value as string},
                                 }, ...this.state.endPoints.slice(key + 1)]
                             })}
                         />
                     </Form.Field>
+                    <Form.Field>
+                        <label>Datum</label>
+                        <Input
+                            value={moment(new Date(this.state.endPoints[key].date)).format('YYYY-MM-DD')}
+                            onChange={(e, {value}) => this.setState({
+                                ...this.state,
+                                endPoints: [...this.state.endPoints.slice(0, key), {
+                                    ...this.state.endPoints[key],
+                                    date: this.setTimeTo12(new Date(value)).getTime()
+                                }, ...this.state.endPoints.slice(key + 1)]
+                            })}
+                            type="date" placeholder='Datum eingeben'/>
+                    </Form.Field>
+                    {/*
                     <Form.Field width={2}>
                         <label>Start Uhrzeit</label>
                         <Input
@@ -230,6 +275,8 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                             })}
                         />
                     </Form.Field>
+                    */}
+
                 </Form.Group>
             )
         });
@@ -241,7 +288,7 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                 <Segment>
                     <Form>
                         <Grid>
-                            <Grid.Row >
+                            <Grid.Row>
                                 <Grid.Column>
                                     {endPointsRow}
                                     <Button floated="right" positive
@@ -261,7 +308,7 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                                                 onChange={(e, {value}) => this.setState({
                                                     freight: {
                                                         ...this.state.freight,
-                                                        widthInMeter: value as any
+                                                        widthInMeter: parseInt(value)
                                                     }
                                                 })}
                                             />
@@ -274,7 +321,7 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                                                 onChange={(e, {value}) => this.setState({
                                                     freight: {
                                                         ...this.state.freight,
-                                                        weightInTon: value as any
+                                                        weightInTon: parseInt(value)
                                                     }
                                                 })}
                                             />
@@ -320,7 +367,7 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                                                 <Select
                                                     options={vehicleOptions}
                                                     placeholder='Fahrzeugtyp auswählen'
-                                                    onChange={(e,{value}) => this.setState({
+                                                    onChange={(e, {value}) => this.setState({
                                                         ...this.state,
                                                         neededVehicle: {
                                                             ...this.state.neededVehicle,
@@ -331,15 +378,16 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                                             </Form.Field>
                                             <Form.Field>
                                                 <label>Länge</label>
-                                                <Input type='number' placeholder='Länge eingeben' onChange={(e, {value}) => {
-                                                    this.setState({
-                                                        ...this.state,
-                                                        neededVehicle: {
-                                                            ...this.state.neededVehicle,
-                                                            length: 1
-                                                        }
-                                                    })
-                                                }}/>
+                                                <Input type='number' placeholder='Länge eingeben'
+                                                       onChange={(e, {value}) => {
+                                                           this.setState({
+                                                               ...this.state,
+                                                               neededVehicle: {
+                                                                   ...this.state.neededVehicle,
+                                                                   length: 1
+                                                               }
+                                                           })
+                                                       }}/>
                                             </Form.Field>
                                         </Form.Group>
 
@@ -351,12 +399,12 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                                                     label='GPS Ortung'
                                                     value='gps'
                                                     checked={this.state.neededVehicle.additionalEquipment.includes('gps')}
-                                                    onClick={(e, value)=> this.handleAdditionalEquipmentChange(value.value as string)}/>
+                                                    onClick={(e, value) => this.handleAdditionalEquipmentChange(value.value as string)}/>
                                                 <Form.Checkbox
                                                     label='Hebebühne'
-                                                    value='hydraulicRamp'
+                                                    value='hydraulicramp'
                                                     checked={this.state.neededVehicle.additionalEquipment.includes('hydraulicRamp')}
-                                                    onChange={(e, value)=> this.handleAdditionalEquipmentChange(value.value as string)}/>
+                                                    onChange={(e, value) => this.handleAdditionalEquipmentChange(value.value as string)}/>
 
                                             </Form.Field>
                                             <Form.Field>
@@ -369,23 +417,27 @@ export default class FreightSet extends React.Component<any, EndFreight> {
                                 <Grid.Column width={5}>
                                     <Form.Field>
                                         <label>Kontaktperson</label>
-                                        <Select options={contactOptions} value={this.state.contact.name} onChange={(e, {value}) => {this.setState({
-                                            contact: {
-                                                ...this.state.contact,
-                                                name: value as string
-                                            }
-                                        })}}/>
+                                        <Select options={contactOptions} value={this.state.contact.name}
+                                                onChange={(e, {value}) => {
+                                                    this.setState({
+                                                        contact: {
+                                                            ...this.state.contact,
+                                                            name: value as string
+                                                        }
+                                                    })
+                                                }}/>
                                     </Form.Field>
                                     <Form.Field>
                                         <label>interne Bemerkung</label>
-                                        <TextArea value={this.state.internalNote} onChange={(e, {value}) => this.setState({internalNote: value as string})}/>
+                                        <TextArea value={this.state.internalNote}
+                                                  onChange={(e, {value}) => this.setState({internalNote: value as string})}/>
                                     </Form.Field>
                                 </Grid.Column>
                             </Grid.Row>
-                            <Divider style={{marginBottom: "0px",marginLeft: "0px",marginRight: "0px"}}/>
+                            <Divider style={{marginBottom: "0px", marginLeft: "0px", marginRight: "0px"}}/>
                             <Grid.Row style={{background: "#f9f9f9"}}>
                                 <Grid.Column floated="right" width={6}>
-                                    <Button positive onClick={() => this.setCustomer()}> Speichern </Button>
+                                    <Button loading={this.state.loading} positive onClick={() => this.setCustomer()}> Speichern </Button>
                                     <Button negative> Abbrechen </Button>
                                     <Button> Vorlage verwenden </Button>
                                 </Grid.Column>

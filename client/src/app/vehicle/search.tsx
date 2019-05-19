@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Container, Segment, Header, Grid, Divider, Form,Input, Table, Radio, Select, Button} from "semantic-ui-react";
-import {Vehicle, VehicleType} from "../../../../lib/models/util"
+import {Vehicle, VehicleType} from "../../lib/models/util"
 let moment = require('moment');
 
 type EndPoint = {
@@ -104,7 +104,7 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
 
         return (
             <Container style={{marginTop: "80px"}}>
-                <Header as='h1'>Fahrzeug suchen</Header>
+                <Header as='h1'>Fahrt suchen</Header>
                 <Segment>
                     <Form>
                         <Grid divided>

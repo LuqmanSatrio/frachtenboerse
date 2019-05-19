@@ -1,6 +1,6 @@
 import * as request from "request";
-import {EndFreight} from "../../lib/models/freight";
-import {Vehicle} from "../../lib/models/util";
+import {EndFreight} from "./lib/models/freight";
+import {EndPoint, Vehicle} from "./lib/models/util";
 
 
 interface GetRequestParams {
@@ -11,6 +11,18 @@ interface GetRequestParams {
 interface PostRequestParams<ObjectType> {
     path: string;
     body: ObjectType;
+}
+
+interface FreightSearchParam {
+    startingPoint: EndPoint;
+    endPoint: EndPoint;
+    neededVehicle: Vehicle;
+}
+
+interface TourSearchParam {
+    startingPoint: EndPoint;
+    endPoint: EndPoint;
+    vehicle: Vehicle;
 }
 
 
@@ -26,14 +38,23 @@ export class Api {
         return this.baseUrl + path;
     }
 
-    getFreights(vehicle: Vehicle): Promise<any> {
-        const qs: any = {vehicle: vehicle};
+    getTour(tourParams: TourSearchParam): Promise<any> {
         return this.getRequest({
-            path: `/api/freight`, qs: qs
+            path: `/api/tour`, qs: tourParams
+        })
+    }
+
+
+
+    // freights
+    getFreights(freightParams: FreightSearchParam): Promise<any> {
+        return this.getRequest({
+            path: `/api/freight`, qs: freightParams
         });
     }
 
-    sendFreights(freight: EndFreight): Promise<any> {
+    sendFreight(freight: EndFreight): Promise<any> {
+        console.log(freight.pointsBetween)
         return this.putRequest({path: `/api/freight`, body: freight})
     }
 

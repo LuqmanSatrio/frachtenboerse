@@ -15,7 +15,7 @@ export default function Main() {
             <div>
                 <Menu fixed="top" className="hello" style={{marginBottom: "20px"}}>
                     <Container>
-                        <Dropdown item text='Fahrzeuge'>
+                        <Dropdown item text='Fahrten'>
                             <Dropdown.Menu>
                                 <Dropdown.Item as={Link} to="vehicleSearch">Suchen</Dropdown.Item>
                                 <Dropdown.Item as={Link} to="vehicleSet">Einstellen</Dropdown.Item>

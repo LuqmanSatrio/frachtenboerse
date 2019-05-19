@@ -1,4 +1,4 @@
-import {Adress, Company} from "./util";
+import {Address, Company} from "./util";
 
 export interface  User {
     id: number,
@@ -8,6 +8,6 @@ export interface  User {
     firstname: string,
     lastname: string,
     company: Company,
-    adress: Adress,
+    adress: Address,
     taxId: number
 }

@@ -12,7 +12,7 @@ import {
     Select,
     Button
 } from "semantic-ui-react";
-import {Vehicle, VehicleType} from "../../../../lib/models/util"
+import {Vehicle, VehicleType} from "../../lib/models/util"
 
 let moment = require('moment');
 
@@ -91,7 +91,7 @@ export class VehicleSetComponent extends React.Component<any, VehicleSearchState
 
         return (
             <Container style={{marginTop: "80px"}}>
-                <Header as='h1'>Fahrzeug einstellen</Header>
+                <Header as='h1'>Fahrt einstellen</Header>
                 <Segment>
                     <Form>
                         <Grid>
