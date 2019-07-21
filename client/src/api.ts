@@ -23,6 +23,8 @@ interface TourSearchParam {
     startingPoint: EndPoint;
     endPoint: EndPoint;
     vehicle: Vehicle;
+    internalNote?: string;
+    externalNote?: string
 }
 
 
@@ -38,13 +40,17 @@ export class Api {
         return this.baseUrl + path;
     }
 
-    getTour(tourParams: TourSearchParam): Promise<any> {
+    getTour(tourParams: TourSearchParam): Promise<TourSearchParam[]> {
         return this.getRequest({
             path: `/api/tour`, qs: tourParams
         })
     }
 
-
+    sendTour(tourSearchParams: TourSearchParam): Promise<TourSearchParam>{
+        return this.putRequest({
+            path: `/api/tour`, body: tourSearchParams
+        })
+    }
 
     // freights
     getFreights(freightParams: FreightSearchParam): Promise<any> {
@@ -53,8 +59,13 @@ export class Api {
         });
     }
 
+    getAllFreights() :Promise<any> {
+        return this.getRequest({
+            path: `/api/allfreight`
+        });
+    }
+
     sendFreight(freight: EndFreight): Promise<any> {
-        console.log(freight.pointsBetween)
         return this.putRequest({path: `/api/freight`, body: freight})
     }
 

@@ -1,18 +1,32 @@
 import React, {Component} from "react";
-import {Container, Segment, Header, Grid, Divider, Form,Input, Table, Radio, Select, Button} from "semantic-ui-react";
-import {Vehicle, VehicleType} from "../../lib/models/util"
-let moment = require('moment');
+import {
+    Container,
+    Segment,
+    Header,
+    Grid,
+    Divider,
+    Form,
+    Input,
+    Table,
+    Radio,
+    Select,
+    Button,
+    Dropdown
+} from "semantic-ui-react";
+import {countryOptions, Vehicle, VehicleType, EndPoint} from "../../lib/models/util"
+import {Api} from "../../api"
 
-type EndPoint = {
-    location: string,
-    date: string
-}
+const moment = require('moment');
+
+const api = new Api();
+
 
 type VehicleSearchState = {
     startingPoint: EndPoint,
-    endpoints: EndPoint,
+    endPoint: EndPoint,
     vehicle: Vehicle,
-    searched: boolean
+    searched: boolean,
+    result: any[]
 }
 const vehicleOptions = [{key: "s", text: 'Sattelzug', value: 'Sattelzug'}, {
     key: "g",
@@ -27,12 +41,16 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
 
         this.state = {
             startingPoint: {
-                location: "",
-                date: moment().format('YYYY-MM-DD')
+                address: {
+                    street: ""
+                },
+                date: this.setTimeTo12(new Date()).getTime()
             },
-            endpoints: {
-                location: "",
-                date: moment().format('YYYY-MM-DD')
+            endPoint: {
+                address: {
+                    street: ""
+                },
+                date: this.setTimeTo12(new Date()).getTime()
             },
             vehicle: {
                 vehicleType: "Sattelzug",
@@ -40,13 +58,37 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
                 length: 0,
                 additionalEquipment: []
             },
-            searched: false
+            searched: false,
+            result: []
         }
     }
 
+    async searchTour() {
+        this.setState({searched: true});
+        try {
+            const result = await api.getTour({
+                startingPoint: this.state.startingPoint,
+                endPoint: this.state.endPoint,
+                vehicle: this.state.vehicle
+            });
+            console.log(result);
+            this.setState({result: result})
 
-    handleAdditionalEquipmentChange(value: string){
-        if(this.state.vehicle.additionalEquipment.includes(value)) {
+        } catch (e) {
+            console.log(e)
+        }
+
+        this.setState({searched: true});
+    }
+
+    setTimeTo12(date: Date) {
+        date.setHours(12, 0, 0, 0);
+        return (date)
+    }
+
+
+    handleAdditionalEquipmentChange(value: string) {
+        if (this.state.vehicle.additionalEquipment.includes(value)) {
             this.setState({
                 ...this.state,
                 vehicle: {
@@ -54,8 +96,8 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
                     additionalEquipment: this.state.vehicle.additionalEquipment.filter(item => item !== value)
                 }
 
-        })}
-        else {
+            })
+        } else {
             this.setState({
                 ...this.state,
                 vehicle: {
@@ -71,32 +113,17 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
 
         const {searched} = this.state;
 
-        let showTable = searched? "block": "none";
+        let showTable = searched ? "block" : "none";
 
-        let suggestedSearchResult = [{
-                date: "23.12.1995",
-                startingPoint: "De, Hamburg 21129",
-                stopover: ["DK,FR,HU"],
-                weight: 24,
-                length: 7,
-                vehicletype: "Sattelzug"
-            },
-        {
-            date: "23.12.1995",
-                startingPoint: "De, Hamburg 21129",
-            stopover: ["DK","FR","HU"],
-            weight: 24,
-            length: 7,
-            vehicletype:"Sattelzug"
-        }].map(result => {
-            return(
-                <Table.Row>
+        let suggestedSearchResult = this.state.result.map((result, key) => {
+            return (
+                <Table.Row key={key}>
                     <Table.Cell>{result.date}</Table.Cell>
                     <Table.Cell>{result.startingPoint}</Table.Cell>
                     <Table.Cell>{result.stopover.join(" ,")}</Table.Cell>
                     <Table.Cell>{result.weight + " kg"}</Table.Cell>
                     <Table.Cell>{result.length + " m"}</Table.Cell>
-                    <Table.Cell><a href="/vehicleDetail" > {result.vehicletype} </a></Table.Cell>
+                    <Table.Cell> {result.vehicletype} </Table.Cell>
                 </Table.Row>
 
             )
@@ -111,70 +138,148 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
                             <Grid.Row>
                                 <Grid.Column width={4}>
                                     <Form.Field>
-                                        <label>Startpunkt</label>
-                                        <Input type='number' value={this.state.startingPoint.location} onChange={(e,{value}) =>this.setState({
-                                            ...this.state,
-                                            startingPoint : {
-                                                ...this.state.startingPoint,
-                                                location: value
-                                            }
-                                        })
-                                        } placeholder='Postleitzahl eingeben'/>
+                                        <label>Stadt</label>
+                                        <Input value={this.state.startingPoint.address.city}
+                                               onChange={(e, {value}) => {
+                                                   this.setState({
+                                                       ...this.state,
+                                                       startingPoint: {
+                                                           ...this.state.startingPoint,
+                                                           address: {
+                                                               ...this.state.startingPoint.address,
+                                                               city: value
+                                                           }
+                                                       }
+                                                   });
+                                               }
+                                               } placeholder='Stadt eingeben'/>
                                     </Form.Field>
+                                    <Form.Group>
+                                        <Form.Field width={10}>
+                                            <label>Postleitzahl</label>
+                                            <Input type='number' value={this.state.startingPoint.address.postcode}
+                                                   onChange={(e, {value}) => this.setState({
+                                                       ...this.state,
+                                                       startingPoint: {
+                                                           ...this.state.startingPoint,
+                                                           address: {
+                                                               ...this.state.startingPoint.address,
+                                                               postcode: value
+                                                           }
+                                                       }
+                                                   })
+                                                   }/>
+                                        </Form.Field>
+                                        <Form.Field width={14}>
+                                            <label>Land</label>
+                                            <Dropdown fluid
+                                                      selection value={this.state.startingPoint.address.country}
+                                                      options={countryOptions}
+                                                      onChange={(e, {value}) => this.setState({
+                                                          ...this.state,
+                                                          startingPoint: {
+                                                              ...this.state.startingPoint,
+                                                              address: {
+                                                                  ...this.state.startingPoint.address,
+                                                                  country: value as string
+                                                              }
+                                                          }
+                                                      })
+                                                      }/>
+                                        </Form.Field>
+                                    </Form.Group>
                                     <Form.Field>
                                         <label>Datum</label>
                                         <Input
-                                            value={this.state.startingPoint.date}
+                                            value={moment(new Date(this.state.startingPoint.date)).format('YYYY-MM-DD')}
                                             onChange={(e, {value}) => {
-                                            this.setState({
-                                            ...this.state,
-                                                startingPoint: {
-                                                    ...this.state.startingPoint,
-                                                    date: (moment(value).format('YYYY-MM-DD'))
-                                                }
-                                        })}} type="date" placeholder='Datum eingeben'/>
+                                                this.setState({
+                                                    ...this.state,
+                                                    startingPoint: {
+                                                        ...this.state.startingPoint,
+                                                        date: this.setTimeTo12(new Date(value)).getTime()
+                                                    }
+                                                })
+                                            }} type="date" placeholder='Datum eingeben'/>
                                     </Form.Field>
                                 </Grid.Column>
                                 <Divider vertical/>
                                 <Grid.Column width={4}>
                                     <Form.Field>
-                                        <label>Endpunkt</label>
-                                        <Input type='number' placeholder='Postleitzahl eingeben' onChange={(e, {value}) => {
-                                            this.setState({
-                                                ...this.state,
-                                                endpoints : {
-                                                    ...this.state.endpoints,
-                                                    location: value
-                                                }
-                                            })
-
-                                        }}/>
+                                        <label>Stadt</label>
+                                        <Input value={this.state.endPoint.address.city}
+                                               onChange={(e, {value}) => this.setState({
+                                                   ...this.state,
+                                                   endPoint: {
+                                                       ...this.state.endPoint,
+                                                       address: {
+                                                           ...this.state.endPoint.address,
+                                                           city: value
+                                                       }
+                                                   }
+                                               })
+                                               } placeholder='Stadt eingeben'/>
                                     </Form.Field>
+                                    <Form.Group>
+                                        <Form.Field width={10}>
+                                            <label>Postleitzahl</label>
+                                            <Input type='number' value={this.state.endPoint.address.postcode}
+                                                   onChange={(e, {value}) => this.setState({
+                                                       ...this.state,
+                                                       endPoint: {
+                                                           ...this.state.endPoint,
+                                                           address: {
+                                                               ...this.state.endPoint.address,
+                                                               postcode: value
+                                                           }
+                                                       }
+                                                   })
+                                                   }/>
+                                        </Form.Field>
+                                        <Form.Field width={14}>
+                                            <label>Land</label>
+                                            <Dropdown fluid
+                                                      selection value={this.state.endPoint.address.country}
+                                                      options={countryOptions}
+                                                      onChange={(e, {value}) => this.setState({
+                                                          ...this.state,
+                                                          endPoint: {
+                                                              ...this.state.endPoint,
+                                                              address: {
+                                                                  ...this.state.endPoint.address,
+                                                                  country: value as string
+                                                              }
+                                                          }
+                                                      })
+                                                      }/>
+                                        </Form.Field>
+                                    </Form.Group>
                                     <Form.Field>
                                         <label>Datum</label>
                                         <Input
-                                            value={this.state.endpoints.date}
+                                            value={moment(new Date(this.state.endPoint.date)).format('YYYY-MM-DD')}
                                             onChange={(e, {value}) => {
-                                            this.setState({
-                                                ...this.state,
-                                                endpoints: {
-                                                    ...this.state.endpoints,
-                                                    date: (moment(value).format('YYYY-MM-DD'))
-                                                }
-                                            })}}  type="date" placeholder='Datum eingeben'/>
+                                                this.setState({
+                                                    ...this.state,
+                                                    endPoint: {
+                                                        ...this.state.endPoint,
+                                                        date: this.setTimeTo12(new Date(value)).getTime()
+                                                    }
+                                                })
+                                            }} type="date" placeholder='Datum eingeben'/>
                                     </Form.Field>
                                 </Grid.Column>
                                 <Grid.Column width={8}>
                                     <Header as='h4'> Fahrzeugart auswählen </Header>
-                                        <Form.Group
-                                            style={{marginTop: "25px"}}
-                                            widths={"equal"}>
+                                    <Form.Group
+                                        style={{marginTop: "25px"}}
+                                        widths={"equal"}>
                                         <Form.Field>
                                             <label>Fahrzeugtyp</label>
                                             <Select
                                                 options={vehicleOptions}
                                                 placeholder='Fahrzeugtyp auswählen'
-                                                onChange={(e,{value}) => this.setState({
+                                                onChange={(e, {value}) => this.setState({
                                                     ...this.state,
                                                     vehicle: {
                                                         ...this.state.vehicle,
@@ -183,19 +288,20 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
                                                 })}
                                             />
                                         </Form.Field>
-                                    <Form.Field>
-                                        <label>Länge</label>
-                                        <Input type='number' placeholder='Länge eingeben' onChange={(e, {value}) => {
-                                            this.setState({
-                                                ...this.state,
-                                                vehicle: {
-                                                    ...this.state.vehicle,
-                                                    length: 1
-                                                }
-                                            })
-                                        }}/>
-                                    </Form.Field>
-                                        </Form.Group>
+                                        <Form.Field>
+                                            <label>Länge</label>
+                                            <Input type='number' placeholder='Länge eingeben'
+                                                   onChange={(e, {value}) => {
+                                                       this.setState({
+                                                           ...this.state,
+                                                           vehicle: {
+                                                               ...this.state.vehicle,
+                                                               length: parseInt(value)
+                                                           }
+                                                       })
+                                                   }}/>
+                                        </Form.Field>
+                                    </Form.Group>
 
                                     <Form.Group
                                         widths={"equal"}>
@@ -204,34 +310,41 @@ export class VehicleSearchComponent extends React.Component<any, VehicleSearchSt
                                             <Form.Checkbox
                                                 label='GPS Ortung'
                                                 value='gps'
-                                            checked={this.state.vehicle.additionalEquipment.includes('gps')}
-                                            onClick={(e, value)=> this.handleAdditionalEquipmentChange(value.value as string)}/>
+                                                checked={this.state.vehicle.additionalEquipment.includes('gps')}
+                                                onClick={(e, value) => this.handleAdditionalEquipmentChange(value.value as string)}/>
                                             <Form.Checkbox
                                                 label='Hebebühne'
                                                 value='hydraulicRamp'
                                                 checked={this.state.vehicle.additionalEquipment.includes('hydraulicRamp')}
-                                                onChange={(e, value)=> this.handleAdditionalEquipmentChange(value.value as string)}/>
+                                                onChange={(e, value) => this.handleAdditionalEquipmentChange(value.value as string)}/>
 
                                         </Form.Field>
                                         <Form.Field>
                                             <label>Gewicht</label>
-                                            <input type="number" placeholder='Gewicht eingeben'/>
+                                            <Input type="number" placeholder='Gewicht eingeben'
+                                                   onChange={(e, {value}) => {
+                                                       this.setState({
+                                                           ...this.state,
+                                                           vehicle: {
+                                                               ...this.state.vehicle,
+                                                               weight: parseInt(value)
+                                                           }
+                                                       })
+                                                   }}/>
                                         </Form.Field>
                                     </Form.Group>
                                 </Grid.Column>
                             </Grid.Row>
                             <Divider/>
 
-                                <Button positive floated="right" style={{marginRight: "30px",marginBottom: "10px"}} type="submit" onClick={() => {
-                                    this.setState({
-                                        ...this.state,
-                                        searched: true
-                                    });
-                                }
-                                }> Suchen </Button>
+                            <Button positive floated="right" style={{marginRight: "30px", marginBottom: "10px"}}
+                                    type="submit" onClick={() => {
+                                this.searchTour()
+                            }
+                            }> Suchen </Button>
 
-                            <Grid.Row  style={{ marginRight: "10px", marginLeft: "10px",display: showTable }}>
-                                <Table celled >
+                            <Grid.Row style={{marginRight: "10px", marginLeft: "10px", display: showTable}}>
+                                <Table celled>
                                     <Table.Header>
                                         <Table.Row>
                                             <Table.HeaderCell width={1}>Datum</Table.HeaderCell>

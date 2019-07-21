@@ -92,6 +92,18 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
         }
     }
 
+    async getAllFreights() {
+        try {
+            let result = await api.getAllFreights();
+            console.log(result);
+
+            this.setState({suggestedResults: result, loading: false});
+
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
 
     handleAdditionalEquipmentChange(value: string) {
         if (this.state.vehicle.additionalEquipment.includes(value)) {
@@ -132,10 +144,10 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
             return (
                 <Table.Row key={key}>
                     <Table.Cell>{moment(new Date(result.startingPoint.date)).format('DD.MM.YYYY')}</Table.Cell>
-                    <Table.Cell>{result.startingPoint.address.city}</Table.Cell>
-                    <Table.Cell>{result.startingPoint.address.city + ", " + result.pointsBetween.map((endpoint) => {
+                    <Table.Cell>{ result.startingPoint? result.startingPoint.address.city : ""}</Table.Cell>
+                    <Table.Cell>{ result.startingPoint && result.pointsBetween && result.endPoint? result.startingPoint.address.city + ", " + result.pointsBetween.map((endpoint) => {
                         return (endpoint.address.city)
-                    }).join(", ") + ", " + result.endPoint.address.city
+                    }).join(", ") + ", " + result.endPoint.address.city : ""
                     }</Table.Cell>
                     <Table.Cell>{result.freight.weightInTon + " kg"}</Table.Cell>
                     <Table.Cell>{result.freight.widthInMeter + " m"}</Table.Cell>
@@ -367,7 +379,7 @@ export class FreightSearchComponent extends React.Component<any, VehicleSearchSt
                                     searched: true,
                                     loading: true
                                 });
-                                this.getFreight();
+                                this.getAllFreights();
                             }
                             }> Suchen </Button>
 

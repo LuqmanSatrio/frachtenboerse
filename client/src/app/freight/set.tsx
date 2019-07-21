@@ -384,7 +384,7 @@ export default class FreightSet extends React.Component<any, freightSetState> {
                                                                ...this.state,
                                                                neededVehicle: {
                                                                    ...this.state.neededVehicle,
-                                                                   length: 1
+                                                                   length: parseInt(value)
                                                                }
                                                            })
                                                        }}/>
@@ -409,7 +409,15 @@ export default class FreightSet extends React.Component<any, freightSetState> {
                                             </Form.Field>
                                             <Form.Field>
                                                 <label>Gewicht</label>
-                                                <input type="number" placeholder='Gewicht eingeben'/>
+                                                <Input type="number" placeholder='Gewicht eingeben'  onChange={(e, {value}) => {
+                                                    this.setState({
+                                                        ...this.state,
+                                                        neededVehicle: {
+                                                            ...this.state.neededVehicle,
+                                                            weight: parseInt(value)
+                                                        }
+                                                    })
+                                                }} />
                                             </Form.Field>
                                         </Form.Group>
                                     </Grid.Column>

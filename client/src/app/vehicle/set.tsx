@@ -10,25 +10,24 @@ import {
     Table,
     TextArea,
     Select,
-    Button
+    Button, Dropdown
 } from "semantic-ui-react";
-import {Vehicle, VehicleType} from "../../lib/models/util"
+import {Vehicle, VehicleType, EndPoint, countryOptions} from "../../lib/models/util"
+import {Api} from "../../api";
+
+const api = new Api();
 
 let moment = require('moment');
 
-type EndPoint = {
-    location: string,
-    date: string
-}
 
 type VehicleSearchState = {
     startingPoint: EndPoint,
-    endpoints: EndPoint,
+    endPoint: EndPoint,
     vehicle: Vehicle,
-    searched: boolean,
-    contactOption: string,
+    loading: boolean,
+    contactOption: object,
     interNote: string,
-    externNote: string
+    externalNote: string
 }
 
 const contactOptions = [{text: "Max Mustermann", value: "Max Mustermann"}]
@@ -45,12 +44,16 @@ export class VehicleSetComponent extends React.Component<any, VehicleSearchState
 
         this.state = {
             startingPoint: {
-                location: "",
-                date: moment().format('YYYY-MM-DD')
+                address: {
+                    street: ""
+                },
+                date: this.setTimeTo12(new Date()).getTime()
             },
-            endpoints: {
-                location: "",
-                date: moment().format('YYYY-MM-DD')
+            endPoint: {
+                address: {
+                    street: ""
+                },
+                date: this.setTimeTo12(new Date()).getTime()
             },
             vehicle: {
                 vehicleType: "Sattelzug",
@@ -58,11 +61,31 @@ export class VehicleSetComponent extends React.Component<any, VehicleSearchState
                 length: 0,
                 additionalEquipment: []
             },
-            searched: false,
-            contactOption: "",
+            loading: false,
+            contactOption: {
+                name: ""
+            },
             interNote: "",
-            externNote: ""
+            externalNote: ""
         }
+    }
+
+    setTimeTo12(date: Date){
+        date.setHours(12,0,0,0);
+        return(date)
+    }
+
+
+    async setTour(){
+        this.setState({loading: true});
+        try {
+           const result = await api.sendTour(this.state);
+            console.log(result);
+        }
+        catch (e) {
+            console.error("error when setting tour", e)
+        }
+        this.setState({loading: false});
     }
 
 
@@ -97,28 +120,68 @@ export class VehicleSetComponent extends React.Component<any, VehicleSearchState
                         <Grid>
                             <Grid.Row divided>
                                 <Grid.Column width={4}>
+                                    <Header as='h4'> Startpunkt </Header>
                                     <Form.Field>
-                                        <label>Startpunkt</label>
-                                        <Input type='number' value={this.state.startingPoint.location}
-                                               onChange={(e, {value}) => this.setState({
-                                                   ...this.state,
-                                                   startingPoint: {
-                                                       ...this.state.startingPoint,
-                                                       location: value
-                                                   }
-                                               })
-                                               } placeholder='Postleitzahl eingeben'/>
+                                        <label>Stadt</label>
+                                        <Input value={this.state.startingPoint.address.city}
+                                               onChange={(e, {value}) => {
+                                                   this.setState({
+                                                       ...this.state,
+                                                       startingPoint: {
+                                                           ...this.state.startingPoint,
+                                                           address: {
+                                                               ...this.state.startingPoint.address,
+                                                               city: value
+                                                           }
+                                                       }
+                                                   });
+                                               }
+                                               } placeholder='Stadt eingeben'/>
                                     </Form.Field>
+                                    <Form.Group>
+                                        <Form.Field width={10}>
+                                            <label>Postleitzahl</label>
+                                            <Input type='number' value={this.state.startingPoint.address.postcode}
+                                                   onChange={(e, {value}) => this.setState({
+                                                       ...this.state,
+                                                       startingPoint: {
+                                                           ...this.state.startingPoint,
+                                                           address: {
+                                                               ...this.state.startingPoint.address,
+                                                               postcode: value
+                                                           }
+                                                       }
+                                                   })
+                                                   }/>
+                                        </Form.Field>
+                                        <Form.Field width={14}>
+                                            <label>Land</label>
+                                            <Dropdown fluid
+                                                      selection value={this.state.startingPoint.address.country}
+                                                      options={countryOptions}
+                                                      onChange={(e, {value}) => this.setState({
+                                                          ...this.state,
+                                                          startingPoint: {
+                                                              ...this.state.startingPoint,
+                                                              address: {
+                                                                  ...this.state.startingPoint.address,
+                                                                  country: value as string
+                                                              }
+                                                          }
+                                                      })
+                                                      }/>
+                                        </Form.Field>
+                                    </Form.Group>
                                     <Form.Field>
                                         <label>Datum</label>
                                         <Input
-                                            value={this.state.startingPoint.date}
+                                            value={moment(new Date(this.state.startingPoint.date)).format('YYYY-MM-DD')}
                                             onChange={(e, {value}) => {
                                                 this.setState({
                                                     ...this.state,
                                                     startingPoint: {
                                                         ...this.state.startingPoint,
-                                                        date: (moment(value).format('YYYY-MM-DD'))
+                                                        date: this.setTimeTo12(new Date(value)).getTime()
                                                     }
                                                 })
                                             }} type="date" placeholder='Datum eingeben'/>
@@ -126,30 +189,66 @@ export class VehicleSetComponent extends React.Component<any, VehicleSearchState
                                 </Grid.Column>
                                 <Divider vertical/>
                                 <Grid.Column width={4}>
+                                    <Header as='h4'> Endpunkt </Header>
                                     <Form.Field>
-                                        <label>Endpunkt</label>
-                                        <Input type='number' placeholder='Postleitzahl eingeben'
-                                               onChange={(e, {value}) => {
-                                                   this.setState({
+                                        <label>Stadt</label>
+                                        <Input value={this.state.endPoint.address.city}
+                                               onChange={(e, {value}) => this.setState({
+                                                   ...this.state,
+                                                   endPoint: {
+                                                       ...this.state.endPoint,
+                                                       address: {
+                                                           ...this.state.endPoint.address,
+                                                           city: value
+                                                       }
+                                                   }
+                                               })
+                                               } placeholder='Stadt eingeben'/>
+                                    </Form.Field>
+                                    <Form.Group>
+                                        <Form.Field width={10}>
+                                            <label>Postleitzahl</label>
+                                            <Input type='number' value={this.state.endPoint.address.postcode}
+                                                   onChange={(e, {value}) => this.setState({
                                                        ...this.state,
-                                                       endpoints: {
-                                                           ...this.state.endpoints,
-                                                           location: value
+                                                       endPoint: {
+                                                           ...this.state.endPoint,
+                                                           address: {
+                                                               ...this.state.endPoint.address,
+                                                               postcode: value
+                                                           }
                                                        }
                                                    })
-
-                                               }}/>
-                                    </Form.Field>
+                                                   }/>
+                                        </Form.Field>
+                                        <Form.Field width={14}>
+                                            <label>Land</label>
+                                            <Dropdown fluid
+                                                      selection value={this.state.endPoint.address.country}
+                                                      options={countryOptions}
+                                                      onChange={(e, {value}) => this.setState({
+                                                          ...this.state,
+                                                          endPoint: {
+                                                              ...this.state.endPoint,
+                                                              address: {
+                                                                  ...this.state.endPoint.address,
+                                                                  country: value as string
+                                                              }
+                                                          }
+                                                      })
+                                                      }/>
+                                        </Form.Field>
+                                    </Form.Group>
                                     <Form.Field>
                                         <label>Datum</label>
                                         <Input
-                                            value={this.state.endpoints.date}
+                                            value={moment(new Date(this.state.endPoint.date)).format('YYYY-MM-DD')}
                                             onChange={(e, {value}) => {
                                                 this.setState({
                                                     ...this.state,
-                                                    endpoints: {
-                                                        ...this.state.endpoints,
-                                                        date: (moment(value).format('YYYY-MM-DD'))
+                                                    endPoint: {
+                                                        ...this.state.endPoint,
+                                                        date: this.setTimeTo12(new Date(value)).getTime()
                                                     }
                                                 })
                                             }} type="date" placeholder='Datum eingeben'/>
@@ -182,7 +281,7 @@ export class VehicleSetComponent extends React.Component<any, VehicleSearchState
                                                            ...this.state,
                                                            vehicle: {
                                                                ...this.state.vehicle,
-                                                               length: 1
+                                                               length: parseInt(value)
                                                            }
                                                        })
                                                    }}/>
@@ -207,7 +306,16 @@ export class VehicleSetComponent extends React.Component<any, VehicleSearchState
                                         </Form.Field>
                                         <Form.Field>
                                             <label>Gewicht</label>
-                                            <input type="number" placeholder='Gewicht eingeben'/>
+                                            <Input type="number" placeholder='Gewicht eingeben'  onChange={(e, {value}) => {
+                                                this.setState({
+                                                    ...this.state,
+                                                    vehicle: {
+                                                        ...this.state.vehicle,
+                                                        length: parseInt(value)
+                                                    }
+                                                })
+                                            }
+                                            }/>
                                         </Form.Field>
                                     </Form.Group>
                                 </Grid.Column>
@@ -222,9 +330,9 @@ export class VehicleSetComponent extends React.Component<any, VehicleSearchState
                                             placeholder='Kontaktperson auswählen'
                                             onChange={(e, {value}) => this.setState({
                                                 ...this.state,
-                                                vehicle: {
-                                                    ...this.state.vehicle,
-                                                    vehicleType: value as VehicleType
+                                                contactOption: {
+                                                    ...this.state.contactOption,
+                                                    name: value
                                                 }
                                             })}
                                         />
@@ -246,10 +354,10 @@ export class VehicleSetComponent extends React.Component<any, VehicleSearchState
                                     <Form.Field>
                                         <label>Externe Bemerkung</label>
                                         <TextArea
-                                            value={this.state.externNote}
+                                            value={this.state.externalNote}
                                             onChange={(e, {value}) => this.setState({
                                                 ...this.state,
-                                                externNote: value as string
+                                                externalNote: value as string
                                             })}
                                         />
                                     </Form.Field>
@@ -258,7 +366,7 @@ export class VehicleSetComponent extends React.Component<any, VehicleSearchState
                             <Divider style={{marginBottom: "0px",marginLeft: "0px",marginRight: "0px"}}/>
                             <Grid.Row style={{background: "#f9f9f9"}}>
                                 <Grid.Column floated="right" width={6}>
-                                    <Button positive> Speichern </Button>
+                                    <Button loading={this.state.loading} positive onClick={() => this.setTour()}> Speichern </Button>
                                     <Button negative> Abbrechen </Button>
                                     <Button> Vorlage verwenden </Button>
                                 </Grid.Column>

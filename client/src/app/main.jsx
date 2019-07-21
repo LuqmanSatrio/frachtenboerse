@@ -6,7 +6,7 @@ import FreightSet from "./freight/set"
 import {FreightSearchComponent} from "./freight/search";
 import {VehicleDetailComponent} from "./vehicle/detail";
 import {BrowserRouter as Router, Link, Route} from "react-router-dom";
-import {Container, Menu, Dropdown} from "semantic-ui-react";
+import {Container, Menu, Dropdown, Image} from "semantic-ui-react";
 
 
 export default function Main() {
@@ -44,6 +44,7 @@ export default function Main() {
                             </Dropdown.Menu>
                         </Dropdown>
                     </Container>
+                    <img src={require('../img/logo.png')} style={{height: "50px", marginRight: "10px"}} />
                 </Menu>
                 <Route path="/"/>
                 <Route exact path="/vehicleSearch" component={VehicleSearchComponent}/>

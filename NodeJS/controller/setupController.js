@@ -1,6 +1,76 @@
 const Freight = require("../models/freightModel");
+const Tour = require("../models/tourModel");
 
 module.exports = function (app) {
+
+    app.get('/api/setUpTour', function (req, res) {
+
+        const newTour = [
+            {
+                startingPoint: {
+                    address: {
+                        street: "Neßdeich",
+                        number: "152",
+                        postcode: "21129",
+                        city: "Paris",
+                        country: "Frankreich"
+                    },
+                    loadingStation: "loadingStation",
+                    date: new Date()
+                },
+                endPoint: {
+                    address: {
+                        street: "Neßdeich",
+                        number: "152",
+                        postcode: "1900",
+                        city: "Wien",
+                        country: "Österreich"
+                    },
+                    loadingStation: "loadingStation",
+                    date: new Date()
+                },
+                vehicle:
+                    {
+                        vehicleType: "Sattelzug",
+                        weight: 10,
+                        length: 10,
+                        additionalEquipment: ["gps", "hydraulicRamp"],
+                    }
+            }, {
+                startingPoint: {
+                    address: {
+                        street: "Neßdeich",
+                        number: "152",
+                        postcode: "21129",
+                        city: "Hamburg",
+                        country: "Deutschland"
+                    },
+                    loadingStation: "loadingStation",
+                    date: new Date()
+                },
+                endPoint: {
+                    address: {
+                        street: "Neßdeich",
+                        number: "152",
+                        postcode: "1900",
+                        city: "Hungary",
+                        country: "Budapest"
+                    },
+                    vehicle:
+                        {
+                            vehicleType: "Sattelzug",
+                            weight: 10,
+                            length: 10,
+                            additionalEquipment: ["gps", "hydraulicRamp"],
+                        }
+                }
+            }
+        ];
+
+        Tour.create(newTour, function (err, results) {
+            res.send(results)
+        })
+    });
 
     app.get('/api/setUpFreight', function (req, res) {
 
