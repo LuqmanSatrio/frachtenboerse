@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "concurrently": "^4.0.1",
-    "underscore": "^1.9.1"
+    "underscore": "^1.12.1"
   }
 }
